@@ -120,14 +120,12 @@ class IOTAVXAVX1MediaPlayer(CoordinatorEntity[IOTAVXAVX1Coordinator], MediaPlaye
     async def async_turn_on(self) -> None:
         """Turn the receiver on."""
         await self._protocol.send_command(CMD_POWER_ON)
-        self._attr_state = MediaPlayerState.ON
-        self.async_write_ha_state()
+        # Optimistic state is set in protocol._apply_optimistic_state()
+        # and pushed via coordinator callback
 
     async def async_turn_off(self) -> None:
         """Turn the receiver off."""
         await self._protocol.send_command(CMD_POWER_OFF)
-        self._attr_state = MediaPlayerState.OFF
-        self.async_write_ha_state()
 
     # --- Volume ---
 

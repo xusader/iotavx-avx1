@@ -1,0 +1,8 @@
+{
+  "name": "IOTAVX AVX1",
+  "domains": ["media_player", "number"],
+  "documentation": "https://github.com/xusader/iotavx-avx1",
+  "issue_tracker": "https://github.com/xusader/iotavx-avx1/issues",
+  "iot_class": "local_polling",
+  "version": "1.0.0"
+}

@@ -86,14 +86,10 @@ class IOTAVXAVX1Remote(RemoteEntity):
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn on (power on the AVX1)."""
         await self._protocol.send_command(CMD_POWER_ON)
-        self._attr_is_on = True
-        self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off (power off the AVX1)."""
         await self._protocol.send_command(CMD_POWER_OFF)
-        self._attr_is_on = False
-        self.async_write_ha_state()
 
     async def async_send_command(self, command: Iterable[str], **kwargs: Any) -> None:
         """Send one or more button presses.

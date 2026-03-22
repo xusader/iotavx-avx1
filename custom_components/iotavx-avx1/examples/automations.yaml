@@ -1,0 +1,170 @@
+# ============================================================
+# IOTAVX AVX1 – Beispiel-Automationen für Home Assistant
+# ============================================================
+# Kopiere die gewünschten Automationen in deine automations.yaml
+# oder erstelle sie über die HA-UI.
+
+
+# --- 1. Kino-Modus: AVX1 einschalten + HDMI 1 + Pro Logic ---
+- alias: "Kino Modus starten"
+  description: "Schaltet den AVX1 ein, wählt HDMI 1 und Pro Logic IIx"
+  trigger:
+    - platform: state
+      entity_id: media_player.wohnzimmer_tv
+      to: "on"
+  condition: []
+  action:
+    - service: media_player.turn_on
+      target:
+        entity_id: media_player.iotavx_avx1
+    - delay:
+        seconds: 3
+    - service: media_player.select_source
+      target:
+        entity_id: media_player.iotavx_avx1
+      data:
+        source: "HDMI 1"
+    - delay:
+        seconds: 1
+    - service: media_player.select_sound_mode
+      target:
+        entity_id: media_player.iotavx_avx1
+      data:
+        sound_mode: "Pro Logic IIx"
+  mode: single
+
+
+# --- 2. AVX1 ausschalten wenn TV aus geht ---
+- alias: "AVX1 mit TV ausschalten"
+  description: "Schaltet den AVX1 aus, wenn der TV ausgeschaltet wird"
+  trigger:
+    - platform: state
+      entity_id: media_player.wohnzimmer_tv
+      to: "off"
+      for:
+        seconds: 10
+  condition:
+    - condition: state
+      entity_id: media_player.iotavx_avx1
+      state: "on"
+  action:
+    - service: media_player.turn_off
+      target:
+        entity_id: media_player.iotavx_avx1
+  mode: single
+
+
+# --- 3. Musik-Modus: Stereo + Analog 1 ---
+- alias: "Musik Modus"
+  description: "Wechselt auf Analog 1 Eingang mit Stereo-Modus"
+  trigger:
+    - platform: state
+      entity_id: input_boolean.musik_modus
+      to: "on"
+  action:
+    - service: media_player.turn_on
+      target:
+        entity_id: media_player.iotavx_avx1
+    - delay:
+        seconds: 3
+    - service: media_player.select_source
+      target:
+        entity_id: media_player.iotavx_avx1
+      data:
+        source: "Analog 1"
+    - service: media_player.select_sound_mode
+      target:
+        entity_id: media_player.iotavx_avx1
+      data:
+        sound_mode: "Stereo"
+  mode: single
+
+
+# --- 4. Nachtmodus: Lautstärke begrenzen + Dimmer runter ---
+- alias: "AVX1 Nachtmodus"
+  description: "Reduziert Lautstärke und dimmt Display nach 22 Uhr"
+  trigger:
+    - platform: time
+      at: "22:00:00"
+  condition:
+    - condition: state
+      entity_id: media_player.iotavx_avx1
+      state: "on"
+  action:
+    - service: media_player.volume_set
+      target:
+        entity_id: media_player.iotavx_avx1
+      data:
+        volume_level: 0.25
+    - service: number.set_value
+      target:
+        entity_id: number.iotavx_avx1_dimmer
+      data:
+        value: 2
+  mode: single
+
+
+# --- 5. PS5 eingeschaltet → HDMI 3 wählen ---
+- alias: "PS5 Eingang wählen"
+  description: "Wechselt automatisch auf HDMI 3, wenn die PS5 erkannt wird"
+  trigger:
+    - platform: state
+      entity_id: media_player.playstation_5
+      to: "on"
+  condition:
+    - condition: state
+      entity_id: media_player.iotavx_avx1
+      state: "on"
+  action:
+    - service: media_player.select_source
+      target:
+        entity_id: media_player.iotavx_avx1
+      data:
+        source: "HDMI 3"
+    - service: media_player.select_sound_mode
+      target:
+        entity_id: media_player.iotavx_avx1
+      data:
+        sound_mode: "Pro Logic IIx"
+  mode: single
+
+
+# --- 6. OSD-Menü per Skript navigieren ---
+# Kann z.B. über ein Dashboard-Button ausgelöst werden.
+- alias: "AVX1 Speaker Setup öffnen"
+  description: "Navigiert im OSD-Menü zum Speaker Setup"
+  trigger:
+    - platform: state
+      entity_id: input_boolean.avx1_speaker_setup
+      to: "on"
+  action:
+    - service: remote.send_command
+      target:
+        entity_id: remote.iotavx_avx1_remote
+      data:
+        command:
+          - menu
+          - down
+          - down
+          - enter
+    - service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.avx1_speaker_setup
+  mode: single
+
+
+# --- 7. Lautstärke-Begrenzung als Schutz ---
+- alias: "AVX1 Max-Lautstärke begrenzen"
+  description: "Verhindert, dass die Lautstärke über 70% steigt"
+  trigger:
+    - platform: numeric_state
+      entity_id: media_player.iotavx_avx1
+      attribute: volume_level
+      above: 0.7
+  action:
+    - service: media_player.volume_set
+      target:
+        entity_id: media_player.iotavx_avx1
+      data:
+        volume_level: 0.7
+  mode: restart

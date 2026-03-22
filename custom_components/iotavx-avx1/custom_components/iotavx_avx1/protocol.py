@@ -361,14 +361,17 @@ class IOTAVXAVX1Protocol:
     async def send_command(self, command: str) -> str | None:
         """Send a command to the AVX1.
 
-        The response is not returned directly – it will be picked up
-        by the background listener and parsed into state updates.
-        Returns the raw response (if any) for diagnostic purposes.
+        Sets optimistic state immediately so the UI reflects the change
+        before the device echoes back. The background listener will
+        confirm or correct the state when the echo arrives.
         """
         if not self._connected or self._writer is None:
             _LOGGER.warning("Not connected – attempting reconnect")
             if not await self._reconnect():
                 return None
+
+        # Optimistic state update BEFORE sending
+        self._apply_optimistic_state(command)
 
         async with self._lock:
             try:
@@ -387,6 +390,42 @@ class IOTAVXAVX1Protocol:
                 self._notify_availability(False)
                 self._log_command(command, False, str(err))
                 return None
+
+    def _apply_optimistic_state(self, command: str) -> None:
+        """Apply optimistic state change based on the command being sent."""
+        changed = False
+
+        # Power
+        if command == "@112":  # Power On
+            self.state.power = True
+            changed = True
+        elif command == "@113":  # Power Off
+            self.state.power = False
+            changed = True
+
+        # Mute
+        elif command == "@11Q":  # Mute On
+            self.state.muted = True
+            changed = True
+        elif command == "@11R":  # Mute Off
+            self.state.muted = False
+            changed = True
+
+        # Source
+        source_name = _COMMAND_TO_SOURCE.get(command)
+        if source_name:
+            self.state.source = source_name
+            changed = True
+
+        # Sound mode
+        mode_name = _COMMAND_TO_MODE.get(command)
+        if mode_name:
+            self.state.sound_mode = mode_name
+            changed = True
+
+        if changed:
+            self.state.last_update = time.time()
+            self._notify_state_changed()
 
     async def send_commands(self, commands: list[str]) -> None:
         """Send multiple commands sequentially."""
