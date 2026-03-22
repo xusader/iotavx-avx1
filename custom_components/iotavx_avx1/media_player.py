@@ -115,9 +115,9 @@ class IOTAVXAVX1MediaPlayer(CoordinatorEntity[IOTAVXAVX1Coordinator], MediaPlaye
         await self._send(CMD_POWER_OFF)
 
     async def async_set_volume_level(self, volume: float) -> None:
-        state = self._protocol.state
-        rng = state.volume_max - state.volume_min
-        raw = int(state.volume_min + volume * rng)
+        """Set volume. HA 0.0-1.0 maps to AVX1 raw 0-800 (display 0.0-80.0)."""
+        raw = int(round(volume * 800))
+        raw = max(0, min(800, raw))
         await self._send(f"{CMD_VOLUME_SET}{raw:03d}")
 
     async def async_volume_up(self) -> None:

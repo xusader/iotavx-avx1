@@ -33,7 +33,7 @@ class AVX1State:
         self.power: bool = False
         self.volume_raw: int = 0
         self.volume_min: int = 0
-        self.volume_max: int = 800
+        self.volume_max: int = 600
         self.muted: bool = False
         self.source: str | None = None
         self.sound_mode: str | None = None
@@ -42,10 +42,12 @@ class AVX1State:
 
     @property
     def volume_level(self) -> float:
-        rng = self.volume_max - self.volume_min
-        if rng <= 0:
-            return 0.0
-        return max(0.0, min(1.0, (self.volume_raw - self.volume_min) / rng))
+        """Convert raw volume to HA level (0.0-1.0).
+
+        AVX1 volume: 0.0-80.0 on display, raw @14K values 0-800.
+        HA slider 0.0-1.0 maps to raw 0-800.
+        """
+        return max(0.0, min(1.0, self.volume_raw / 800.0))
 
     def as_dict(self) -> dict[str, Any]:
         return {
