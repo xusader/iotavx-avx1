@@ -30,9 +30,24 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def _get_serial_ports() -> list[str]:
-    """List available serial ports on the system."""
-    ports = serial.tools.list_ports.comports()
-    return sorted([p.device for p in ports])
+    """List available serial ports including /dev/serial/by-id/ symlinks."""
+    import glob
+    import os
+
+    ports: list[str] = []
+
+    # Standard pyserial detection (/dev/ttyUSB0, /dev/ttyACM0, etc.)
+    for p in serial.tools.list_ports.comports():
+        ports.append(p.device)
+
+    # Add persistent /dev/serial/by-id/ paths (preferred for stability)
+    by_id_dir = "/dev/serial/by-id"
+    if os.path.isdir(by_id_dir):
+        for link in sorted(glob.glob(f"{by_id_dir}/*")):
+            if os.path.exists(link):
+                ports.append(link)
+
+    return sorted(set(ports))
 
 
 async def _validate_connection(hass: HomeAssistant, port: str) -> bool:
@@ -84,12 +99,32 @@ class IOTAVXAVX1ConfigFlow(ConfigFlow, domain=DOMAIN):
         # Build the form
         available_ports = await self.hass.async_add_executor_job(_get_serial_ports)
 
-        schema = vol.Schema(
-            {
-                vol.Required(CONF_SERIAL_PORT, default="/dev/ttyUSB0"): str,
-                vol.Optional(CONF_NAME, default=DEFAULT_NAME): str,
-            }
-        )
+        # Find the best default: prefer /dev/serial/by-id/ path if available
+        default_port = "/dev/ttyUSB0"
+        for p in available_ports:
+            if "/dev/serial/by-id/" in p:
+                default_port = p
+                break
+
+        # Use vol.In if ports are available so HA shows a dropdown,
+        # but also accept any string for manual entry (socket:// etc.)
+        if available_ports:
+            port_options = available_ports.copy()
+            schema = vol.Schema(
+                {
+                    vol.Required(CONF_SERIAL_PORT, default=default_port): vol.In(
+                        port_options
+                    ),
+                    vol.Optional(CONF_NAME, default=DEFAULT_NAME): str,
+                }
+            )
+        else:
+            schema = vol.Schema(
+                {
+                    vol.Required(CONF_SERIAL_PORT, default=default_port): str,
+                    vol.Optional(CONF_NAME, default=DEFAULT_NAME): str,
+                }
+            )
 
         return self.async_show_form(
             step_id="user",

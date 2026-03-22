@@ -422,11 +422,15 @@ class IOTAVXAVX1Protocol:
         return self.state.as_dict()
 
     async def test_connection(self) -> bool:
-        """Test if we can communicate with the device."""
+        """Test if the serial port can be opened.
+
+        We only verify that the port exists and is accessible.
+        The device may be in standby and not respond, so we don't
+        require a response – just a successful port open.
+        """
         if not await self.connect():
             return False
-        # Send a harmless status query and wait briefly for any response
-        await self.send_command("@12S")
-        await asyncio.sleep(2.0)
-        # If we got a DIM heartbeat, the device is alive
-        return self.state.dimmer > 0 or self.state.last_update > 0
+        # Port opened successfully – that's enough for setup.
+        # The background listener will pick up state once the device
+        # is powered on.
+        return True

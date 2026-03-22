@@ -40,12 +40,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: IOTAVXAVX1ConfigEntry) -
 
     protocol = IOTAVXAVX1Protocol(port)
 
-    if not await protocol.connect():
-        _LOGGER.error("Could not connect to IOTAVX AVX1 on %s", port)
-        return False
+    # Try to connect, but don't fail setup if device is off/standby.
+    # The background listener will pick up state once it powers on.
+    connected = await protocol.connect()
+    if not connected:
+        _LOGGER.warning(
+            "Could not connect to IOTAVX AVX1 on %s – will retry in background",
+            port,
+        )
 
     coordinator = IOTAVXAVX1Coordinator(hass, protocol, scan_interval)
     await coordinator.async_setup()
+    # Don't raise on first refresh – device may be in standby
     await coordinator.async_config_entry_first_refresh()
 
     hass.data.setdefault(DOMAIN, {})

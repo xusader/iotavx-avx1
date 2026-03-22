@@ -72,19 +72,21 @@ class IOTAVXAVX1Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         The real state updates come from _on_state_changed above.
         This method runs at scan_interval as a health check.
+        Never raises UpdateFailed – the device may be in standby
+        and that's a normal operating state.
         """
         if not self.protocol.connected:
-            raise UpdateFailed("Not connected to AVX1")
+            _LOGGER.debug("Not connected to AVX1 – returning last known state")
+            return self.protocol.state.as_dict()
 
         import time
         elapsed = time.time() - self.protocol.state.last_update
 
         if elapsed > HEARTBEAT_TIMEOUT and self.protocol.state.last_update > 0:
-            _LOGGER.warning(
+            _LOGGER.debug(
                 "No data from AVX1 for %.0fs – device may be in standby",
                 elapsed,
             )
-            # Device is probably in standby (no heartbeat)
             self.protocol.state.power = False
 
         return self.protocol.state.as_dict()
