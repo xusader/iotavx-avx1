@@ -1,0 +1,13 @@
+{
+  "domain": "iotavx_avx1",
+  "name": "IOTAVX AVX1",
+  "codeowners": ["@xusader"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/xusader/iotavx-avx1",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/xusader/iotavx-avx1/issues",
+  "requirements": ["pyserial==3.5", "pyserial-asyncio==0.6"],
+  "version": "1.0.0"
+}

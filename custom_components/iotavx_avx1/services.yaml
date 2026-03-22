@@ -1,0 +1,41 @@
+send_command:
+  name: Send RS-232 Command
+  description: Send a raw RS-232 command to the IOTAVX AVX1.
+  fields:
+    command:
+      name: Command
+      description: "The RS-232 command string (e.g. '@112' for Power On)."
+      required: true
+      example: "@112"
+      selector:
+        text:
+
+set_dimmer:
+  name: Set Display Dimmer
+  description: Set the VFD display brightness (0 = off, 10 = full).
+  fields:
+    level:
+      name: Level
+      description: "Brightness level from 0 to 10."
+      required: true
+      example: 5
+      selector:
+        number:
+          min: 0
+          max: 10
+          step: 1
+
+navigate_menu:
+  name: Navigate OSD Menu
+  description: >
+    Send a sequence of OSD navigation commands.
+    Available buttons: menu, up, down, left, right, enter, exit, back.
+    Raw RS-232 commands starting with @ are also accepted.
+  fields:
+    commands:
+      name: Commands
+      description: "List of button names or raw RS-232 commands to send in sequence."
+      required: true
+      example: '["menu", "down", "down", "enter"]'
+      selector:
+        object:

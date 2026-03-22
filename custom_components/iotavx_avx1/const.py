@@ -1,0 +1,104 @@
+"""Constants for the IOTAVX AVX1 integration."""
+
+DOMAIN = "iotavx_avx1"
+DEFAULT_NAME = "IOTAVX AVX1"
+
+CONF_SERIAL_PORT = "serial_port"
+CONF_NAME = "name"
+CONF_SCAN_INTERVAL = "scan_interval"
+
+# RS-232 settings
+SERIAL_BAUDRATE = 9600
+SERIAL_BYTESIZE = 8
+SERIAL_PARITY = "N"
+SERIAL_STOPBITS = 1
+SERIAL_TIMEOUT = 1.0
+
+# Polling interval in seconds
+SCAN_INTERVAL_SECONDS = 10
+
+# --- RS-232 Command Set ---
+
+# Power
+CMD_POWER_ON = "@112"
+CMD_POWER_OFF = "@113"
+
+# Sources
+CMD_SOURCE_TV_ARC = "@11B"
+CMD_SOURCE_HDMI1 = "@116"
+CMD_SOURCE_HDMI2 = "@115"
+CMD_SOURCE_HDMI3 = "@15A"
+CMD_SOURCE_HDMI4 = "@15B"
+CMD_SOURCE_HDMI5 = "@15C"
+CMD_SOURCE_HDMI6 = "@15D"
+CMD_SOURCE_COAX = "@117"
+CMD_SOURCE_OPTICAL = "@15E"
+CMD_SOURCE_ANALOG1 = "@15F"
+CMD_SOURCE_ANALOG2 = "@15G"
+CMD_SOURCE_BLUETOOTH = "@15H"
+CMD_SOURCE_DOWN = "@15X"
+CMD_SOURCE_UP = "@15Y"
+
+# Sound Modes
+CMD_MODE_UP = "@11D"
+CMD_MODE_DOWN = "@13W"
+CMD_MODE_STEREO = "@11E"
+CMD_MODE_PRO_LOGIC = "@11F"
+CMD_MODE_ALL_CH_STEREO = "@11C"
+CMD_MODE_NEO6 = "@13H"
+CMD_MODE_SOURCE_DIRECT = "@13J"
+
+# Volume
+CMD_MUTE_ON = "@11Q"
+CMD_MUTE_OFF = "@11R"
+CMD_VOLUME_SET = "@11P"  # + 3-char extension
+CMD_VOLUME_UP = "@11S"
+CMD_VOLUME_DOWN = "@11T"
+
+# Trim
+CMD_REAR_UP = "@11g"
+CMD_REAR_DOWN = "@11j"
+CMD_CENTER_UP = "@11k"
+CMD_CENTER_DOWN = "@11n"
+CMD_SUB_UP = "@11p"
+CMD_SUB_DOWN = "@11r"
+
+# Display / System
+CMD_DIM = "@12D"  # + 2-char extension (00–10)
+CMD_RESET = "@12L"
+CMD_STATUS = "@12S"
+
+# Menu Navigation
+CMD_MENU = "@141"
+CMD_UP_ARROW = "@142"
+CMD_DOWN_ARROW = "@143"
+CMD_RIGHT_ARROW = "@144"
+CMD_LEFT_ARROW = "@145"
+CMD_ENTER = "@146"
+CMD_EXIT = "@147"
+CMD_RETURN = "@148"
+
+# Source mapping: friendly name -> command
+SOURCE_MAP: dict[str, str] = {
+    "TV (ARC)": CMD_SOURCE_TV_ARC,
+    "HDMI 1": CMD_SOURCE_HDMI1,
+    "HDMI 2": CMD_SOURCE_HDMI2,
+    "HDMI 3": CMD_SOURCE_HDMI3,
+    "HDMI 4": CMD_SOURCE_HDMI4,
+    "HDMI 5": CMD_SOURCE_HDMI5,
+    "HDMI 6": CMD_SOURCE_HDMI6,
+    "Coax": CMD_SOURCE_COAX,
+    "Optical": CMD_SOURCE_OPTICAL,
+    "Analog 1": CMD_SOURCE_ANALOG1,
+    "Analog 2": CMD_SOURCE_ANALOG2,
+    "Bluetooth": CMD_SOURCE_BLUETOOTH,
+}
+
+# Sound mode mapping: friendly name -> command
+SOUND_MODE_MAP: dict[str, str] = {
+    "Stereo": CMD_MODE_STEREO,
+    "Pro Logic IIx": CMD_MODE_PRO_LOGIC,
+    "All Channel Stereo": CMD_MODE_ALL_CH_STEREO,
+    "Neo:6": CMD_MODE_NEO6,
+    "Source Direct": CMD_MODE_SOURCE_DIRECT,
+}

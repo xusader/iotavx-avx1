@@ -1,0 +1,30 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up IOTAVX AVX1",
+        "description": "Enter the serial port where the AVX1 is connected.\n\nDetected ports: {ports}\n\nFor network serial bridges use: socket://host:port",
+        "data": {
+          "serial_port": "Serial Port",
+          "name": "Name"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect to AVX1. Check port and cable connection."
+    },
+    "abort": {
+      "already_configured": "This port is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "IOTAVX AVX1 Options",
+        "data": {
+          "scan_interval": "Polling interval (seconds)"
+        }
+      }
+    }
+  }
+}
