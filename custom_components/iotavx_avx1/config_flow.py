@@ -54,9 +54,9 @@ async def _validate_connection(hass: HomeAssistant, port: str) -> bool:
     """Validate that we can talk to the AVX1 on the given port."""
     protocol = IOTAVXAVX1Protocol(port)
     try:
-        return await protocol.test_connection()
+        return await hass.async_add_executor_job(protocol.connect)
     finally:
-        await protocol.disconnect()
+        await hass.async_add_executor_job(protocol.disconnect)
 
 
 class IOTAVXAVX1ConfigFlow(ConfigFlow, domain=DOMAIN):
