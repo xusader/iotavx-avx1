@@ -1,8 +1,6 @@
 {
   "name": "IOTAVX AVX1",
-  "domains": ["media_player", "number"],
-  "documentation": "https://github.com/xusader/iotavx-avx1",
-  "issue_tracker": "https://github.com/xusader/iotavx-avx1/issues",
-  "iot_class": "local_polling",
-  "version": "1.0.0"
+  "content_in_root": false,
+  "render_readme": true,
+  "homeassistant": "2024.1.0"
 }
